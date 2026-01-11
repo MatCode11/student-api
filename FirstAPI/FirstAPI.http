@@ -17,8 +17,24 @@ Content-Type: application/json
 
 {
     "Id": 3,
-    "firstName": "Alice",
+    "firstName": "Michelle",
     "lastName": "Johnson",
-    "email": "alice.johnson@example.com",
+    "email": "michelle.johnson@example.com",
     "age": 22
 }
+
+###
+PUT {{rootURL}}/api/student/2
+Content-Type: application/json
+
+{
+    "Id": 2,
+    "firstName": "Alice",
+    "lastName": "Williams",
+    "email": "alice.williams@example.com",
+    "age": 23
+}
+
+###
+DELETE {{rootURL}}/api/student/2
+Accept: application/json

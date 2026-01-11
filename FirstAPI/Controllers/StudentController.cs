@@ -42,7 +42,7 @@ namespace FirstAPI.Controllers
             }
             return Ok(student);
         }
-        
+
         // POST: api/student
         // User creates a new student
         [HttpPost]
@@ -58,5 +58,44 @@ namespace FirstAPI.Controllers
 
             return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
         }
+
+        // PUT: api/student/5
+        // User updates an existing student
+        [HttpPut("{id}")]
+        public ActionResult<Student> UpdateStudent(int id, [FromBody] Student student)
+        {
+            if (student == null)
+            {
+                return BadRequest(new { message = "Student data is required" });
+            }
+
+            var existingStudent = students.FirstOrDefault(s => s.Id == id);
+            if (existingStudent == null)
+            {
+                return NotFound(new { message = "Student not found" });
+            }
+
+            existingStudent.FirstName = student.FirstName;
+            existingStudent.LastName = student.LastName;
+            existingStudent.Email = student.Email;
+
+            return Ok(existingStudent);
+        }
+
+        // DELETE: api/student/5
+        // User deletes an existing student
+        [HttpDelete("{id}")]
+        public ActionResult DeleteStudent(int id)
+        {
+            var student = students.FirstOrDefault(s => s.Id == id);
+            if (student == null)
+            {
+                return NotFound(new { message = "Student not found" });
+            }
+
+            students.Remove(student);
+            return Ok(new { message = "Student deleted successfully" });
+        }
+
     }
 }
