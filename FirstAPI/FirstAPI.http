@@ -6,3 +6,19 @@ Accept: application/json
 ###
 GET {{rootURL}}/api/student
 Accept: application/json
+
+###
+GET {{rootURL}}/api/student/1
+Accept: application/json
+
+###
+POST {{rootURL}}/api/student
+Content-Type: application/json
+
+{
+    "Id": 3,
+    "firstName": "Alice",
+    "lastName": "Johnson",
+    "email": "alice.johnson@example.com",
+    "age": 22
+}

@@ -30,3 +30,4 @@
 /Users/macbook/Documents/Programming/Learn Backend /C#/FirstAPI/FirstAPI/obj/Debug/net9.0/FirstAPI.pdb
 /Users/macbook/Documents/Programming/Learn Backend /C#/FirstAPI/FirstAPI/obj/Debug/net9.0/FirstAPI.genruntimeconfig.cache
 /Users/macbook/Documents/Programming/Learn Backend /C#/FirstAPI/FirstAPI/obj/Debug/net9.0/ref/FirstAPI.dll
+/Users/macbook/Documents/Programming/Learn Backend /C#/FirstAPI/FirstAPI/obj/Debug/net9.0/FirstAPI.sourcelink.json
