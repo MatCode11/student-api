@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using FirstAPI.Models;
+using FirstAPI.Data;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace FirstAPI.Controllers
 {
@@ -9,33 +11,27 @@ namespace FirstAPI.Controllers
     [Route("api/[controller]")]
     public class StudentController : ControllerBase
     {
-        private static List<Student> students = new List<Student>
-        {
-            new Student { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com" },
-            new Student { Id = 2, FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com" }
+        private readonly AppDbContext _db;
 
-        };
+        public StudentController(AppDbContext db)
+        {
+            _db = db;
+        }
 
         // GET: api/student
         //User Request all student
         [HttpGet]
-        public ActionResult<IEnumerable<Student>> GetAllStudents()
+        public async Task<ActionResult<IEnumerable<Student>>> GetAllStudents()
         {
-            return Ok(students);
+            return Ok(await _db.Students.ToListAsync());
         }
-
-        // [HttpGet]
-        // public ActionResult<List<Student>> GetStudents()
-        // {
-        //     return Ok(students);
-        // }
 
         // GET: api/student/5
         //User Request one student
         [HttpGet("{id}")]
-        public ActionResult<Student> GetStudentById(int id)
+        public async Task<ActionResult<Student>> GetStudentById(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == id);
+            var student = await _db.Students.FindAsync(id);
             if (student == null)
             {
                 return NotFound(new { message = "Student not found" });
@@ -46,15 +42,15 @@ namespace FirstAPI.Controllers
         // POST: api/student
         // User creates a new student
         [HttpPost]
-        public ActionResult<Student> CreateStudent([FromBody] Student student)
+        public async Task<ActionResult<Student>> CreateStudent([FromBody] Student student)
         {
             if (student == null)
             {
                 return BadRequest(new { message = "Student data is required" });
             }
 
-            student.Id = students.Max(s => s.Id) + 1;
-            students.Add(student);
+            _db.Students.Add(student);
+            await _db.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
         }
@@ -62,14 +58,14 @@ namespace FirstAPI.Controllers
         // PUT: api/student/5
         // User updates an existing student
         [HttpPut("{id}")]
-        public ActionResult<Student> UpdateStudent(int id, [FromBody] Student student)
+        public async Task<ActionResult<Student>> UpdateStudent(int id, [FromBody] Student student)
         {
             if (student == null)
             {
                 return BadRequest(new { message = "Student data is required" });
             }
 
-            var existingStudent = students.FirstOrDefault(s => s.Id == id);
+            var existingStudent = await _db.Students.FindAsync(id);
             if (existingStudent == null)
             {
                 return NotFound(new { message = "Student not found" });
@@ -78,6 +74,9 @@ namespace FirstAPI.Controllers
             existingStudent.FirstName = student.FirstName;
             existingStudent.LastName = student.LastName;
             existingStudent.Email = student.Email;
+            existingStudent.Age = student.Age;
+
+            await _db.SaveChangesAsync();
 
             return Ok(existingStudent);
         }
@@ -85,15 +84,16 @@ namespace FirstAPI.Controllers
         // DELETE: api/student/5
         // User deletes an existing student
         [HttpDelete("{id}")]
-        public ActionResult DeleteStudent(int id)
+        public async Task<ActionResult> DeleteStudent(int id)
         {
-            var student = students.FirstOrDefault(s => s.Id == id);
+            var student = await _db.Students.FindAsync(id);
             if (student == null)
             {
                 return NotFound(new { message = "Student not found" });
             }
 
-            students.Remove(student);
+            _db.Students.Remove(student);
+            await _db.SaveChangesAsync();
             return Ok(new { message = "Student deleted successfully" });
         }
 
