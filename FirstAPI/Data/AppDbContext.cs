@@ -8,5 +8,6 @@ namespace FirstAPI.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Student> Students { get; set; } = null!;
+        public DbSet<Teacher> Teachers { get; set; } = null!;
     }
 }
