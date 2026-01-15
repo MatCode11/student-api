@@ -11,3 +11,7 @@ namespace FirstAPI.Data
         public DbSet<Teacher> Teachers { get; set; } = null!;
     }
 }
+
+builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 33)))
+);
