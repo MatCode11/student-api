@@ -12,6 +12,3 @@ namespace FirstAPI.Data
     }
 }
 
-builder.Services.AddDbContext<AppDbContext>(options => 
-    options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 33)))
-);
