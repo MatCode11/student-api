@@ -16,20 +16,67 @@ POST {{rootURL}}/api/student
 Content-Type: application/json
 
 {
-    "Id": 3,
-    "firstName": "Michelle",
-    "lastName": "Johnson",
-    "email": "michelle.johnson@example.com",
+    "Id": 1,
+    "firstName": "Mat",
+    "lastName": "Pogi",
+    "email": "mat.pogi@example.com",
     "age": 22
 }
 
+###
+POST {{rootURL}}/api/student
+Content-Type: application/json
+
+{
+    "Id": 2,
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@example.com",
+    "age": 21
+}
+
+###
+POST {{rootURL}}/api/student
+Content-Type: application/json
+
+{
+    "Id": 3,
+    "firstName": "Sarah",
+    "lastName": "Johnson",
+    "email": "sarah.johnson@example.com",
+    "age": 20
+}
+
+###
+POST {{rootURL}}/api/student
+Content-Type: application/json
+
+{
+    "Id": 4,
+    "firstName": "David",
+    "lastName": "Brown",
+    "email": "david.brown@example.com",
+    "age": 24
+}
+
+###
+POST {{rootURL}}/api/student
+Content-Type: application/json
+
+{
+    "Id": 5,
+    "firstName": "Emma",
+    "lastName": "Davis",
+    "email": "emma.davis@example.com",
+    "age": 22
+}
 ###
 PUT {{rootURL}}/api/student/2
 Content-Type: application/json
 
 {
     "Id": 2,
-    "firstName": "Alice",
+    "firstName": "Alco",
     "lastName": "Williams",
     "email": "alice.williams@example.com",
     "age": 23
