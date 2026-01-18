@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace FirstAPI.Controllers
 {
     [ApiController]
@@ -18,71 +19,69 @@ namespace FirstAPI.Controllers
             _db = db;
         }
 
-        // GET: api/student
-        //User Request all student
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Student>>> GetAllStudents()
-        {
-            return Ok(await _db.Students.ToListAsync());
-        }
-
-        // GET: api/student/5
-        //User Request one student
         [HttpGet("{id}")]
-        public async Task<ActionResult<Student>> GetStudentById(int id)
+        public async Task<IActionResult> GetStudentById(int id)
         {
             var student = await _db.Students.FindAsync(id);
+
             if (student == null)
+                return NotFound();
+
+            var response = new StudentResponseDto
             {
-                return NotFound(new { message = "Student not found" });
-            }
-            return Ok(student);
+                Id = student.Id,
+                FullName = $"{student.FirstName} {student.LastName}",
+                Email = student.Email,
+                Age = student.Age
+            };
+
+            return Ok(response);
         }
 
-        // POST: api/student
-        // User creates a new student
+
         [HttpPost]
-        public async Task<ActionResult<Student>> CreateStudent([FromBody] Student student)
+        public async Task<IActionResult> Create(CreateStudentDto dto)
         {
-            if (student == null)
+            var student = new Student
             {
-                return BadRequest(new { message = "Student data is required" });
-            }
+                FirstName = dto.FirstName,
+                LastName = dto.LastName,
+                Email = dto.Email,
+                Age = dto.Age
+            };
 
             _db.Students.Add(student);
             await _db.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
+            var response = new StudentResponseDto
+            {
+                Id = student.Id,
+                FullName = $"{student.FirstName} {student.LastName}",
+                Email = student.Email,
+                Age = student.Age
+            };
+
+            return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, response);
         }
 
-        // PUT: api/student/5
-        // User updates an existing student
         [HttpPut("{id}")]
-        public async Task<ActionResult<Student>> UpdateStudent(int id, [FromBody] Student student)
+        public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
         {
+            var student = await _db.Students.FindAsync(id);
+
             if (student == null)
-            {
-                return BadRequest(new { message = "Student data is required" });
-            }
+                return NotFound();
 
-            var existingStudent = await _db.Students.FindAsync(id);
-            if (existingStudent == null)
-            {
-                return NotFound(new { message = "Student not found" });
-            }
-
-            existingStudent.FirstName = student.FirstName;
-            existingStudent.LastName = student.LastName;
-            existingStudent.Email = student.Email;
-            existingStudent.Age = student.Age;
+            student.FirstName = dto.FirstName;
+            student.LastName = dto.LastName;
+            student.Email = dto.Email;
+            student.Age = dto.Age;
 
             await _db.SaveChangesAsync();
 
-            return Ok(existingStudent);
+            return NoContent(); // 204
         }
 
-        // DELETE: api/student/5
-        // User deletes an existing student
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteStudent(int id)
         {
@@ -99,3 +98,100 @@ namespace FirstAPI.Controllers
 
     }
 }
+
+
+// namespace FirstAPI.Controllers
+// {
+//     [ApiController]
+//     [Route("api/[controller]")]
+//     public class StudentController : ControllerBase
+//     {
+//         private readonly AppDbContext _db;
+
+//         public StudentController(AppDbContext db)
+//         {
+//             _db = db;
+//         }
+
+//         // GET: api/student
+//         //User Request all student
+//         [HttpGet]
+//         public async Task<ActionResult<IEnumerable<Student>>> GetAllStudents()
+//         {
+//             return Ok(await _db.Students.ToListAsync());
+//         }
+
+//         // GET: api/student/5
+//         //User Request one student
+//         [HttpGet("{id}")]
+//         public async Task<ActionResult<Student>> GetStudentById(int id)
+//         {
+//             var student = await _db.Students.FindAsync(id);
+//             if (student == null)
+//             {
+//                 return NotFound(new { message = "Student not found" });
+//             }
+//             return Ok(student);
+//         }
+
+//         // POST: api/student
+//         // User creates a new student
+//         [HttpPost]
+//         public async Task<ActionResult<Student>> CreateStudent([FromBody] Student student)
+//         {
+//             if (student == null)
+//             {
+//                 return BadRequest(new { message = "Student data is required" });
+//             }
+
+//             _db.Students.Add(student);
+//             await _db.SaveChangesAsync();
+
+//             return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, student);
+//         }
+
+//         // PUT: api/student/5
+//         // User updates an existing student
+//         [HttpPut("{id}")]
+//         public async Task<ActionResult<Student>> UpdateStudent(int id, [FromBody] Student student)
+//         {
+//             if (student == null)
+//             {
+//                 return BadRequest(new { message = "Student data is required" });
+//             }
+
+//             var existingStudent = await _db.Students.FindAsync(id);
+//             if (existingStudent == null)
+//             {
+//                 return NotFound(new { message = "Student not found" });
+//             }
+
+//             existingStudent.FirstName = student.FirstName;
+//             existingStudent.LastName = student.LastName;
+//             existingStudent.Email = student.Email;
+//             existingStudent.Age = student.Age;
+
+//             await _db.SaveChangesAsync();
+
+//             return Ok(existingStudent);
+//         }
+
+//         // DELETE: api/student/5
+//         // User deletes an existing student
+//         [HttpDelete("{id}")]
+//         public async Task<ActionResult> DeleteStudent(int id)
+//         {
+//             var student = await _db.Students.FindAsync(id);
+//             if (student == null)
+//             {
+//                 return NotFound(new { message = "Student not found" });
+//             }
+
+//             _db.Students.Remove(student);
+//             await _db.SaveChangesAsync();
+//             return Ok(new { message = "Student deleted successfully" });
+//         }
+
+//     }
+// }
+
