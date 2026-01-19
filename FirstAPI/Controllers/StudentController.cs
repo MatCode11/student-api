@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using FirstAPI.Models;
 using FirstAPI.Data;
+using FirstAPI.DTOs.Students;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;

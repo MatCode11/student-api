@@ -1,4 +1,6 @@
 //for POST
+namespace FirstAPI.DTOs.Students;
+
 public class CreateStudentDto
 {
     public string FirstName { get; set; } = null!;

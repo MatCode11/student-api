@@ -1,4 +1,6 @@
 //for UPDATE
+namespace FirstAPI.DTOs.Students;
+
 public class UpdateStudentDto
 {
     public string FirstName { get; set; } = null!;

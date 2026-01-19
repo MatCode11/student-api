@@ -1,4 +1,6 @@
 //for GET
+namespace FirstAPI.DTOs.Students;
+
 public class StudentResponseDto
 {
     public int Id { get; set; }
