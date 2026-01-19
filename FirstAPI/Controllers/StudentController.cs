@@ -10,95 +10,152 @@ using Microsoft.EntityFrameworkCore;
 namespace FirstAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class StudentController : ControllerBase
+[Route("api/students")]
+public class StudentsController : ControllerBase
+{
+    private readonly IStudentService _service;
+
+    public StudentsController(IStudentService service)
     {
-        private readonly AppDbContext _db;
+        _service = service;
+    }
 
-        public StudentController(AppDbContext db)
-        {
-            _db = db;
-        }
+    [HttpPost]
+    public async Task<IActionResult> Create(CreateStudentDto dto)
+    {
+        var result = await _service.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+    }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetStudentById(int id)
-        {
-            var student = await _db.Students.FindAsync(id);
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var student = await _service.GetByIdAsync(id);
+        if (student == null) return NotFound();
 
-            if (student == null)
-                return NotFound();
+        return Ok(student);
+    }
 
-            var response = new StudentResponseDto
-            {
-                Id = student.Id,
-                FullName = $"{student.FirstName} {student.LastName}",
-                Email = student.Email,
-                Age = student.Age
-            };
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        return Ok(await _service.GetAllAsync());
+    }
 
-            return Ok(response);
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
+    {
+        var success = await _service.UpdateAsync(id, dto);
+        if (!success) return NotFound();
 
+        return NoContent();
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(CreateStudentDto dto)
-        {
-            var student = new Student
-            {
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                Email = dto.Email,
-                Age = dto.Age
-            };
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var success = await _service.DeleteAsync(id);
+        if (!success) return NotFound();
 
-            _db.Students.Add(student);
-            await _db.SaveChangesAsync();
-
-            var response = new StudentResponseDto
-            {
-                Id = student.Id,
-                FullName = $"{student.FirstName} {student.LastName}",
-                Email = student.Email,
-                Age = student.Age
-            };
-
-            return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, response);
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
-        {
-            var student = await _db.Students.FindAsync(id);
-
-            if (student == null)
-                return NotFound();
-
-            student.FirstName = dto.FirstName;
-            student.LastName = dto.LastName;
-            student.Email = dto.Email;
-            student.Age = dto.Age;
-
-            await _db.SaveChangesAsync();
-
-            return NoContent(); // 204
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteStudent(int id)
-        {
-            var student = await _db.Students.FindAsync(id);
-            if (student == null)
-            {
-                return NotFound(new { message = "Student not found" });
-            }
-
-            _db.Students.Remove(student);
-            await _db.SaveChangesAsync();
-            return Ok(new { message = "Student deleted successfully" });
-        }
-
+        return NoContent();
     }
 }
+
+}
+
+
+// namespace FirstAPI.Controllers
+// {
+//     [ApiController]
+//     [Route("api/[controller]")]
+//     public class StudentController : ControllerBase
+//     {
+//         private readonly AppDbContext _db;
+
+//         public StudentController(AppDbContext db)
+//         {
+//             _db = db;
+//         }
+
+//         [HttpGet("{id}")]
+//         public async Task<IActionResult> GetStudentById(int id)
+//         {
+//             var student = await _db.Students.FindAsync(id);
+
+//             if (student == null)
+//                 return NotFound();
+
+//             var response = new StudentResponseDto
+//             {
+//                 Id = student.Id,
+//                 FullName = $"{student.FirstName} {student.LastName}",
+//                 Email = student.Email,
+//                 Age = student.Age
+//             };
+
+//             return Ok(response);
+//         }
+
+
+//         [HttpPost]
+//         public async Task<IActionResult> Create(CreateStudentDto dto)
+//         {
+//             var student = new Student
+//             {
+//                 FirstName = dto.FirstName,
+//                 LastName = dto.LastName,
+//                 Email = dto.Email,
+//                 Age = dto.Age
+//             };
+
+//             _db.Students.Add(student);
+//             await _db.SaveChangesAsync();
+
+//             var response = new StudentResponseDto
+//             {
+//                 Id = student.Id,
+//                 FullName = $"{student.FirstName} {student.LastName}",
+//                 Email = student.Email,
+//                 Age = student.Age
+//             };
+
+//             return CreatedAtAction(nameof(GetStudentById), new { id = student.Id }, response);
+//         }
+
+//         [HttpPut("{id}")]
+//         public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
+//         {
+//             var student = await _db.Students.FindAsync(id);
+
+//             if (student == null)
+//                 return NotFound();
+
+//             student.FirstName = dto.FirstName;
+//             student.LastName = dto.LastName;
+//             student.Email = dto.Email;
+//             student.Age = dto.Age;
+
+//             await _db.SaveChangesAsync();
+
+//             return NoContent(); // 204
+//         }
+
+//         [HttpDelete("{id}")]
+//         public async Task<ActionResult> DeleteStudent(int id)
+//         {
+//             var student = await _db.Students.FindAsync(id);
+//             if (student == null)
+//             {
+//                 return NotFound(new { message = "Student not found" });
+//             }
+
+//             _db.Students.Remove(student);
+//             await _db.SaveChangesAsync();
+//             return Ok(new { message = "Student deleted successfully" });
+//         }
+
+//     }
+// }
 
 
 // namespace FirstAPI.Controllers
