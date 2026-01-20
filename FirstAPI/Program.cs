@@ -19,6 +19,8 @@ if (string.IsNullOrEmpty(connection))
     throw new Exception("Database connection string 'DefaultConnection' not found.");
 }
 
+
+
 // Use an explicit server version to avoid requiring a running DB at design time
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 33))));
 
@@ -31,6 +33,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
