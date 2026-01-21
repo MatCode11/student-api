@@ -6,10 +6,12 @@ using Microsoft.EntityFrameworkCore;
 public class StudentService : IStudentService
 {
     private readonly AppDbContext _context;
+    private readonly ILogger<StudentService> _logger;
 
-    public StudentService(AppDbContext context)
+    public StudentService(AppDbContext context, ILogger<StudentService> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<StudentResponseDto> CreateAsync(CreateStudentDto dto)
@@ -30,8 +32,14 @@ public class StudentService : IStudentService
 
     public async Task<StudentResponseDto?> GetByIdAsync(int id)
     {
+        _logger.LogInformation("Fetching student with ID {StudentId}", id);
+
         var student = await _context.Students.FindAsync(id);
-        if (student == null) return null;
+        if (student == null)
+        {
+            _logger.LogWarning("Student with ID {StudentId} not found", id);
+            return null;
+        }
 
         return MapToResponse(student);
     }

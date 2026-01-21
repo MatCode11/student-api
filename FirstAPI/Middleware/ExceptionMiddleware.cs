@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-
+using Microsoft.Extensions.Logging;
 public class ExceptionMiddleware
 {
     private readonly RequestDelegate _next;
