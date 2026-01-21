@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using FirstAPI.Data;
 using Serilog;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,6 +47,10 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CreateStudentDtoValidator>();
 
 app.UseSerilogRequestLogging();
 
