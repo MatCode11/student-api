@@ -5,13 +5,17 @@ using FirstAPI.DTOs.Students;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace FirstAPI.Controllers
 {
     [ApiController]
 [Route("api/students")]
+
+[Authorize]
 public class StudentsController : ControllerBase
+
 {
     private readonly IStudentService _service;
 
@@ -62,6 +66,7 @@ public class StudentsController : ControllerBase
 }
 
 }
+
 
 
 // namespace FirstAPI.Controllers
