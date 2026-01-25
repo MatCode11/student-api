@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 public class TeacherService : ITeacherService
 {
     private readonly AppDbContext _context;
-    private readonly ILogger<StudentService> _logger;
+    private readonly ILogger<TeacherService> _logger;
 
-    public TeacherService(AppDbContext context, ILogger<StudentService> logger)
+    public TeacherService(AppDbContext context, ILogger<TeacherService> logger)
     {
         _context = context;
         _logger = logger;

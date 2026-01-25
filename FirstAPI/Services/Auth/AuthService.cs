@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using FirstAPI.Data; // Add this line or replace with the correct namespace for AppDbContext
+using FirstAPI.Data;
 using Microsoft.EntityFrameworkCore;
 
 public class AuthService : IAuthService
@@ -20,6 +20,15 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
     {
+        // Check if email already exists
+        var existingUser = await _context.Users
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+        if (existingUser != null)
+        {
+            throw new InvalidOperationException("Email is already registered.");
+        }
+
         var user = new User
         {
             Email = dto.Email,
@@ -37,8 +46,7 @@ public class AuthService : IAuthService
     public async Task<AuthResponseDto?> LoginAsync(LoginDto dto)
     {
         var user = await _context.Users
-            .
-            FirstOrDefaultAsync(u => u.Email == dto.Email);
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
         if (user == null) return null;
 

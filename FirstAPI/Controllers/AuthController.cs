@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using System;
 
 namespace FirstAPI.Controllers
 {
@@ -17,8 +18,15 @@ namespace FirstAPI.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterDto dto)
         {
-            var result = await _authService.RegisterAsync(dto);
-            return Ok(result);
+            try
+            {
+                var result = await _authService.RegisterAsync(dto);
+                return Ok(result);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { message = ex.Message });
+            }
         }
 
         [HttpPost("login")]

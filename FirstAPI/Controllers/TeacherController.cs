@@ -1,65 +1,55 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FirstAPI.Data;
-using FirstAPI.Models;
+using Microsoft.AspNetCore.Authorization;
+using FirstAPI.DTOs.Teachers;
 
 namespace FirstAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class TeacherController : ControllerBase
     {
-        private readonly AppDbContext _db;
-        public TeacherController(AppDbContext db) => _db = db;
+        private readonly ITeacherService _service;
+
+        public TeacherController(ITeacherService service)
+        {
+            _service = service;
+        }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll() =>
-            Ok(await _db.Teachers.ToListAsync());
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _service.GetAllAsync());
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
-            var t = await _db.Teachers.FindAsync(id);
-            if (t == null) return NotFound();
-            return Ok(t);
+            var teacher = await _service.GetByIdAsync(id);
+            if (teacher == null) return NotFound();
+            return Ok(teacher);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Teacher teacher)
+        public async Task<IActionResult> Create(CreateTeacherDto dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            _db.Teachers.Add(teacher);
-            await _db.SaveChangesAsync();
-            return CreatedAtAction(nameof(Get), new { id = teacher.Id }, teacher);
+            var result = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, Teacher teacher)
+        public async Task<IActionResult> Update(int id, UpdateTeacherDto dto)
         {
-            if (id != teacher.Id) return BadRequest();
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-
-            _db.Entry(teacher).State = EntityState.Modified;
-            try { await _db.SaveChangesAsync(); }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _db.Teachers.AnyAsync(x => x.Id == id))
-                {
-                    return NotFound();
-                }
-                throw;
-            }
-
+            var success = await _service.UpdateAsync(id, dto);
+            if (!success) return NotFound();
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var t = await _db.Teachers.FindAsync(id);
-            if (t == null) return NotFound();
-            _db.Teachers.Remove(t);
-            await _db.SaveChangesAsync();
+            var success = await _service.DeleteAsync(id);
+            if (!success) return NotFound();
             return NoContent();
         }
     }
