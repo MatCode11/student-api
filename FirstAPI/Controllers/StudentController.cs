@@ -13,7 +13,7 @@ namespace FirstAPI.Controllers
     [ApiController]
 [Route("api/students")]
 
-[Authorize]
+[Authorize(Policy = "Authenticated")]
 public class StudentsController : ControllerBase
 
 {
@@ -25,6 +25,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = "TeacherOrAdmin")]
     public async Task<IActionResult> Create(CreateStudentDto dto)
     {
         var result = await _service.CreateAsync(dto);
@@ -47,6 +48,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Policy = "TeacherOrAdmin")]
     public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
     {
         var success = await _service.UpdateAsync(id, dto);
@@ -56,6 +58,7 @@ public class StudentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Policy = "TeacherOrAdmin")]
     public async Task<IActionResult> Delete(int id)
     {
         var success = await _service.DeleteAsync(id);

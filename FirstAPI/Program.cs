@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.Security.Claims;
 using DotNetEnv;
 
 // Load .env file if it exists
@@ -83,11 +84,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = jwtIssuer,
             ValidAudience = jwtAudience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey))
+                Encoding.UTF8.GetBytes(jwtKey)),
+            // Map role claims from JWT token
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-builder.Services.AddAuthorization();
+// Configure role-based authorization policies
+builder.Services.AddAuthorization(options =>
+{
+    // Admin policy - full access
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    
+    // Teacher policy - teachers and admins
+    options.AddPolicy("TeacherOrAdmin", policy => policy.RequireRole("Teacher", "Admin"));
+    
+    // User policy - all authenticated users (User, Teacher, Admin)
+    options.AddPolicy("Authenticated", policy => policy.RequireRole("User", "Teacher", "Admin"));
+});
 
 // Use an explicit server version to avoid requiring a running DB at design time
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connection, new MySqlServerVersion(new Version(8, 0, 33))));
