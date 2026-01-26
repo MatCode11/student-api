@@ -1,5 +1,5 @@
 using FluentValidation;
-using FirstAPI.DTOs.Auth;
+using FirstAPI.DTOs;
 
 public class RegisterDtoValidator : AbstractValidator<RegisterDto>
 {
