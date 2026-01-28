@@ -7,10 +7,11 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using System.Security.Claims;
 using DotNetEnv;
-using Microsoft.OpenApi.Models;
 
 
 // Load .env file if it exists
@@ -34,46 +35,61 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog();
 
 // Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+// Add controllers to the service container
+builder.Services.AddControllers();
+
+// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "FirstAPI",
-        Version = "v1"
+        Version = "v1",
+        Description = "FirstAPI ASP.NET Core Web API with JWT authentication"
     });
 
-    // Add JWT Authentication to Swagger
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    // XML comments
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+
+    // Group endpoints by controller name (tag)
+    options.TagActionsBy(api =>
+    {
+        var controllerName = api.GroupName ?? api.ActionDescriptor.RouteValues["controller"];
+        return new[] { controllerName ?? "Default" };
+    });
+    options.DocInclusionPredicate((_, _) => true);
+
+    // JWT Bearer auth definition for Swagger
+    var securityScheme = new OpenApiSecurityScheme
     {
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your valid token.\n\nExample: Bearer eyJhbGciOiJIUzI1NiIs..."
-    });
-
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        Description = "Enter JWT token only (without the 'Bearer ' prefix).",
+        Reference = new OpenApiReference
         {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            Array.Empty<string>()
+            Type = ReferenceType.SecurityScheme,
+            Id = "Bearer"
         }
-    });
+    };
+
+    options.AddSecurityDefinition("Bearer", securityScheme);
+
+    var securityRequirement = new OpenApiSecurityRequirement
+    {
+        { securityScheme, Array.Empty<string>() }
+    };
+
+    options.AddSecurityRequirement(securityRequirement);
 });
-
-
-// Add controllers to the service container
-builder.Services.AddControllers();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -158,17 +174,22 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 // HTTPS Enforcement - Must be before other middleware
 if (!app.Environment.IsDevelopment())
 {
     // HSTS (HTTP Strict Transport Security) - Only in production
     app.UseHsts();
+}
+
+// Swagger only in Development
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "FirstAPI v1");
+        options.DisplayRequestDuration();
+    });
 }
 
 app.UseHttpsRedirection();

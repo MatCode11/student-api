@@ -11,66 +11,94 @@ using Microsoft.AspNetCore.Authorization;
 namespace FirstAPI.Controllers
 {
     [ApiController]
-[Route("api/students")]
-
-[Authorize(Policy = "Authenticated")]
-public class StudentsController : ControllerBase
-
-{
+    [Route("api/students")]
+    [Authorize(Policy = "Authenticated")]
+    public class StudentsController : ControllerBase
+    {
     private readonly IStudentService _service;
 
-    public StudentsController(IStudentService service)
-    {
-        _service = service;
-    }
+        public StudentsController(IStudentService service)
+        {
+            _service = service;
+        }
 
-    [HttpPost]
-    [Authorize(Policy = "TeacherOrAdmin")]
-    public async Task<IActionResult> Create(CreateStudentDto dto)
-    {
-        var result = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-    }
+        /// <summary>
+        /// Creates a new student.
+        /// </summary>
+        /// <remarks>
+        /// This endpoint is restricted to users with the Teacher or Admin role.
+        /// A valid JWT access token must be provided in the Authorization header.
+        /// </remarks>
+        /// <param name="dto">The student data to create.</param>
+        /// <response code="201">The student was created successfully.</response>
+        /// <response code="400">The request data is invalid.</response>
+        /// <response code="401">The user is not authenticated.</response>
+        /// <response code="403">The user is authenticated but not in the required role.</response>
+        [HttpPost]
+        [Authorize(Policy = "TeacherOrAdmin")]
+        [ProducesResponseType(typeof(StudentResponseDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> Create(CreateStudentDto dto)
+        {
+            var result = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+        }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var student = await _service.GetByIdAsync(id);
-        if (student == null) return NotFound();
+        /// <summary>
+        /// Gets a specific student by identifier.
+        /// </summary>
+        /// <param name="id">The unique identifier of the student.</param>
+        /// <response code="200">Returns the student data.</response>
+        /// <response code="401">The user is not authenticated.</response>
+        /// <response code="404">The student was not found.</response>
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(StudentResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var student = await _service.GetByIdAsync(id);
+            if (student == null) return NotFound();
 
-        return Ok(student);
-    }
+            return Ok(student);
+        }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        return Ok(await _service.GetAllAsync());
-    }
+        /// <summary>
+        /// Gets all students.
+        /// </summary>
+        /// <response code="200">Returns the list of students.</response>
+        /// <response code="401">The user is not authenticated.</response>
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<StudentResponseDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _service.GetAllAsync());
+        }
 
-    [HttpPut("{id}")]
-    [Authorize(Policy = "TeacherOrAdmin")]
-    public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
-    {
-        var success = await _service.UpdateAsync(id, dto);
-        if (!success) return NotFound();
+        [HttpPut("{id}")]
+        [Authorize(Policy = "TeacherOrAdmin")]
+        public async Task<IActionResult> Update(int id, UpdateStudentDto dto)
+        {
+            var success = await _service.UpdateAsync(id, dto);
+            if (!success) return NotFound();
 
-        return NoContent();
-    }
+            return NoContent();
+        }
 
-    [HttpDelete("{id}")]
-    [Authorize(Policy = "TeacherOrAdmin")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var success = await _service.DeleteAsync(id);
-        if (!success) return NotFound();
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "TeacherOrAdmin")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _service.DeleteAsync(id);
+            if (!success) return NotFound();
 
-        return NoContent();
+            return NoContent();
+        }
     }
 }
-
-}
-
-
 
 // namespace FirstAPI.Controllers
 // {
