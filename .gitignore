@@ -316,3 +316,6 @@ _ReSharper*/
 *.temp
 *_Backup/
 *.orig
+
+#text files
+*.txt
