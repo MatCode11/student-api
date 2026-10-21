@@ -9,7 +9,7 @@ development concepts.
 
 ---
 
-## 🚀 Features Implemented
+##  Features Implemented
 
 - RESTful API using ASP.NET Core
 - CRUD operations for Student entity
@@ -27,7 +27,7 @@ development concepts.
 
 ---
 
-## 🧱 Project Architecture
+##  Project Architecture
 
 The project follows a layered architecture pattern:
 
@@ -53,7 +53,7 @@ This separation improves maintainability, testability, and scalability.
 
 ---
 
-## 🔐 Authentication & Authorization
+##  Authentication & Authorization
 
 - JWT (JSON Web Token) authentication
 - Tokens are generated during login
@@ -63,7 +63,7 @@ This separation improves maintainability, testability, and scalability.
 
 ---
 
-## 🧪 Validation & Error Handling
+##  Validation & Error Handling
 
 - FluentValidation ensures input is validated at the API boundary
 - Global exception middleware provides consistent error responses
@@ -71,7 +71,7 @@ This separation improves maintainability, testability, and scalability.
 
 ---
 
-## 🛠 Tech Stack
+##  Tech Stack
 
 - ASP.NET Core Web API
 - .NET 9
@@ -83,7 +83,7 @@ This separation improves maintainability, testability, and scalability.
 
 ---
 
-## ▶️ Running the Project
+##  Running the Project
 
 1. Configure your database connection in `appsettings.json`
 2. Apply migrations:
